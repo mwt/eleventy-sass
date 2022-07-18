@@ -15,6 +15,9 @@ test.before(async t => {
 });
 
 test("create css file with rev hash", async t => {
+  let {stdout, stderr } = await exec("ls -R", { cwd: dir });
+  console.error("stdout:", stdout);
+  console.error("stderr:", stderr);
   await t.notThrowsAsync(async () => await fs.access(path.join(dir, `_site/css/style-${ revHash }.css`)));
 });
 
