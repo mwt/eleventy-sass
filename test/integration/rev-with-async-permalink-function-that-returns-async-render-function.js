@@ -11,7 +11,9 @@ let revHash = createHash("md5").update(cssContent).digest("hex").slice(0, 8);
 
 test.before(async t => {
   dir = createProject("rev-with-async-permalink-function-that-returns-async-render-function");
-  await exec("npx @11ty/eleventy --config=config-with-async-permalink-function-that-returns-async-render-function.js", { cwd: dir });
+  let { stdout, stderr } = await exec("npx @11ty/eleventy --config=config-with-async-permalink-function-that-returns-async-render-function.js", { cwd: dir });
+  console.error("STDOUT: ", stdout);
+  console.error("STDERR: ", stderr);
 });
 
 test("create css file with rev hash", async t => {
