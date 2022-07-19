@@ -33,9 +33,12 @@ const createProject = async function(projectName) {
   await Promise.all(promises);
   // await fs.cp(sourceDir, projectDir, { recursive: true });
 
-  // ["package.json", "package-lock.json", "node_modules"].forEach(name => {
-  //   await fs.symlink(name, path.join(projectDir, name));
-  // });
+  let root = path.resolve(".");
+  promises = ["package.json", "package-lock.json", "node_modules"].map(async name => {
+    await fs.symlink(path.join(root, name), path.join(projectDir, name));
+  });
+  await Promise.all(promises);
+  // console.error(abs);
 
   return projectDir;
 };
