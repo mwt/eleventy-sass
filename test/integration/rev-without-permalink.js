@@ -10,7 +10,7 @@ let cssContent = "body{color:red}";
 let revHash = createHash("md5").update(cssContent).digest("hex").slice(0, 8);
 
 test.before(async t => {
-  dir = createProject("rev-without-permalink");
+  dir = await createProject("rev-without-permalink");
   await exec("npx @11ty/eleventy --config=config-without-permalink.js", { cwd: dir });
 });
 

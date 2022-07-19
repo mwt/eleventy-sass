@@ -8,8 +8,8 @@ let dir;
 let cssContent = "body{color:red}";
 let revHash = createHash("md5").update(cssContent).digest("hex").slice(0, 8);
 
-test.serial.before(t => {
-  dir = createProject("rev-with-permalink-function-that-returns-string");
+test.before(async t => {
+  dir = await createProject("rev-with-permalink-function-that-returns-string");
   execSync("npx @11ty/eleventy --config=config-with-permalink-function-that-returns-string.js", { cwd: dir });
 });
 
