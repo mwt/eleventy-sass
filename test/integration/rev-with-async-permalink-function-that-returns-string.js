@@ -10,7 +10,7 @@ let cssContent = "body{color:red}";
 let revHash = createHash("md5").update(cssContent).digest("hex").slice(0, 8);
 
 test.before(async t => {
-  dir = await createProject("rev-with-async-permalink-function-that-returns-string");
+  dir = createProject("rev-with-async-permalink-function-that-returns-string");
   await exec("npx @11ty/eleventy --config=config-with-async-permalink-function-that-returns-string.js", { cwd: dir });
 });
 
