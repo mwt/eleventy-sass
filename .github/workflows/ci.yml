@@ -5,8 +5,15 @@ on:
       - main
       - beta
       - next
+      - dev*
+    paths-ignore:
+      - "*.md"
+      - "docs/**"
   pull_request:
     types: [opened, reopened]
+    paths-ignore:
+      - "*.md"
+      - "docs/**"
 jobs:
   build:
     runs-on: ${{ matrix.os }}
