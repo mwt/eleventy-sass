@@ -22,11 +22,11 @@ test.before(async t => {
   await sem.wait();
   dir = createProject("watcher-dependency-file-update");
   let elev = exec("npx @11ty/eleventy --watch", { cwd: dir });
-  elev.child.on("close", (code) => {
-    // console.error("closing");
-    console.error("TTTTT closing");
-    sem.signal();
-  });
+  // elev.child.on("close", (code) => {
+  //   // console.error("closing");
+  //   console.error("TTTTT closing");
+  //   sem.signal();
+  // });
   elev.child.stdout.on("data", function(data) {
     // console.error("stdout: " + data);
     console.error("TTTTT stdout: " + data);
@@ -37,7 +37,7 @@ test.before(async t => {
   });
   await sem.wait();
 
-  await setTimeout(1000);
+  await setTimeout(300);
   let headerSCSS = path.join(dir, "stylesheets", "header.scss");
   console.error("TTTTT will update header.scss");
   fs.writeFile(headerSCSS, `header {
@@ -47,11 +47,13 @@ test.before(async t => {
 
   await sem.wait();
   console.error("TTTTT updated header.scss");
+  await setTimeout(300);
 
   console.error("TTTTT will send SIGINT");
   elev.child.kill("SIGINT");
   console.error("TTTTT sent SIGINT");
-  await sem.wait();
+  await elev;
+  // await sem.wait();
   console.error("TTTTT setup completed");
 });
 
