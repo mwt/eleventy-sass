@@ -23,23 +23,30 @@ test.before(async t => {
   dir = createProject("watcher-dependency-file-update");
   let elev = exec("npx @11ty/eleventy --watch", { cwd: dir });
   elev.child.on("close", (code) => {
-    console.error("closing");
+    // console.error("closing");
+    console.error("TTTTT closing");
     sem.signal();
   });
   elev.child.stdout.on("data", function(data) {
-    console.error("stdout: " + data);
-    if (data.trim() === "[11ty] Watching…")
+    // console.error("stdout: " + data);
+    console.error("TTTTT stdout: " + data);
+    if (data.trim() === "[11ty] Watching…") {
+      console.error("TTTTT detected [11ty] Watching");
       sem.signal();
+    }
   });
   await sem.wait();
 
   await setTimeout(1000);
   let headerSCSS = path.join(dir, "stylesheets", "header.scss");
+  console.error("TTTTT will update header.scss");
   fs.writeFile(headerSCSS, `header {
     background-color: red;
   }`); 
+  console.error("TTTTT updating header.scss");
 
   await sem.wait();
+  console.error("TTTTT updated header.scss");
 
   elev.child.kill("SIGINT");
   await sem.wait();
