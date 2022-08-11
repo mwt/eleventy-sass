@@ -66,11 +66,15 @@ test("write CSS files compiled from SCSS", async t => {
 
 test("watcher works", async t => {
   let stylePath = path.join(dir, "_site", "stylesheets", "style.css");
+  console.error(`TTTTT style.css path: ${ stylePath }`);
   let styleCSS = await fs.readFile(stylePath, { encoding: "utf8" });
+  console.error(`TTTTT style.css : ${ styleCSS }`);
   t.is(styleCSS, "header{background-color:red}body{background-color:red}");
 
   let headerPath = path.join(dir, "_site", "stylesheets", "header.css");
+  console.error(`TTTTT header.css path: ${ headerPath }`);
   let headerCSS = await fs.readFile(headerPath, { encoding: "utf8" });
+  console.error(`TTTTT header.css : ${ headerCSS }`);
   t.is(headerCSS, "header{background-color:red}");
 });
 
