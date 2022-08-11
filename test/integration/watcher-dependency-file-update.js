@@ -22,11 +22,11 @@ test.before(async t => {
   await sem.wait();
   dir = createProject("watcher-dependency-file-update");
   let elev = exec("npx @11ty/eleventy --watch", { cwd: dir });
-  // elev.child.on("close", (code) => {
-  //   // console.error("closing");
-  //   console.error("TTTTT closing");
-  //   sem.signal();
-  // });
+  elev.child.on("close", (code) => {
+    // console.error("closing");
+    console.error("TTTTT closing");
+    // sem.signal();
+  });
   elev.child.stdout.on("data", function(data) {
     // console.error("stdout: " + data);
     console.error("TTTTT stdout: " + data);
@@ -34,6 +34,9 @@ test.before(async t => {
       console.error("TTTTT detected [11ty] Watching");
       sem.signal();
     }
+  });
+  elev.child.stderr.on("data", function(data) {
+    console.error("TTTTT stderr: " + data);
   });
   await sem.wait();
 
