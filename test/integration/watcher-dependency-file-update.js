@@ -33,7 +33,7 @@ test.before(async t => {
   });
   await sem.wait();
 
-  await setTimeout(100);
+  await setTimeout(300);
   let headerSCSS = path.join(dir, "stylesheets", "header.scss");
   fs.writeFile(headerSCSS, `header {
     background-color: red;
