@@ -1,3 +1,10 @@
+if (parseInt(process.version.match(/^v(\d+)/)[1]) < 16) {
+  const test = require("ava");
+  test("test doesn't support node version < 16", async t => {
+    t.pass();
+  });
+} else {
+
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const path = require("path");
@@ -47,3 +54,5 @@ test("watcher works", async t => {
   let styleCSS = await fs.readFile(path.join(dir, "_site/stylesheets/style.css"), { encoding: "utf8" });
   t.is(styleCSS, "header{background-color:pink}body{background-color:blue}");
 });
+
+}

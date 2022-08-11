@@ -1,3 +1,10 @@
+if (parseInt(process.version.match(/^v(\d+)/)[1]) < 16) {
+  const test = require("ava");
+  test("test doesn't support node version < 16", async t => {
+    t.pass();
+  });
+} else {
+
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const path = require("path");
@@ -27,3 +34,4 @@ test("build", async t => {
   t.is(headerCSS, "header{background-color:pink}");
 });
 
+}
