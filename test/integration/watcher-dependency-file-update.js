@@ -48,8 +48,11 @@ test.before(async t => {
   await sem.wait();
   console.error("TTTTT updated header.scss");
 
+  console.error("TTTTT will send SIGINT");
   elev.child.kill("SIGINT");
+  console.error("TTTTT sent SIGINT");
   await sem.wait();
+  console.error("TTTTT setup completed");
 });
 
 test("write CSS files compiled from SCSS", async t => {
