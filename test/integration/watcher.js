@@ -30,8 +30,8 @@ test.before(async t => {
   await sem.wait();
   dir = createProject("watcher");
   proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 5000 });
-  proc.on("close", (code) => {
-    console.error("closing");
+  proc.on("exit", (code, signal) => {
+    console.error(`exit code: ${ code }, signal: ${ signal }`);
     sem.signal();
   });
   proc.stdout.on("data", function(data) {

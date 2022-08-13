@@ -1,4 +1,4 @@
-if (parseInt(process.version.match(/^v(\d+)/)[1]) >= 16) {
+if (parseInt(process.version.match(/^v(\d+)/)[1]) < 16) {
   const test = require("ava");
   test("test doesn't support node version < 16", async t => {
     t.pass();
