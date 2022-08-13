@@ -18,16 +18,31 @@ const Semaphore = require("@debonet/es6semaphore");
 
 const createProject = require("./_create-project2");
 let dir;
+let proc;
+
+const cleanup = () => {
+  console.error("cleanup");
+  if (proc && !proc.killed) {
+    proc.kill();
+    console.error(`did proc.kill(). proc: ${ proc }`);
+  } else {
+    console.error(`No need to kill in cleanup. proc: ${ proc }`);
+  }
+};
+
+test.after.always("cleanup child process", t => {
+  cleanup();
+});
 
 test.before(async t => {
   let sem = new Semaphore(1);
   await sem.wait();
   dir = createProject("watcher-dependency-file-update");
   // let elev = exec("npx @11ty/eleventy --watch", { cwd: dir });
-  let proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir });
-  proc.on("close", (code) => {
+  proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 6000 });
+  proc.on("exit", (code, signal) => {
     // console.error("closing");
-    console.error("TTTTT closing");
+    console.error(`TTTTT closing code: ${ code }, signal: ${ signal }`);
     sem.signal();
   });
   proc.stdout.on("data", function(data) {
@@ -57,7 +72,8 @@ test.before(async t => {
   await setTimeout(300);
 
   console.error("TTTTT will send SIGINT");
-  proc.kill("SIGINT");
+  // proc.kill("SIGHUP");
+  proc.kill();
   console.error("TTTTT sent SIGINT");
   // await proc;
   await sem.wait();
