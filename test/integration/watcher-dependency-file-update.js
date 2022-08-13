@@ -6,7 +6,9 @@ if (parseInt(process.version.match(/^v(\d+)/)[1]) < 16) {
 } else {
 
 const util = require("util");
-const exec = util.promisify(require("child_process").exec);
+// const exec = util.promisify(require("child_process").exec);
+// const spawn = util.promisify(require("child_process").spawn);
+const spawn = require("child_process").spawn;
 const path = require("path");
 const { promises: fs } = require("fs");
 const { setTimeout } = require("timers/promises");
@@ -21,21 +23,23 @@ test.before(async t => {
   let sem = new Semaphore(1);
   await sem.wait();
   dir = createProject("watcher-dependency-file-update");
-  let elev = exec("npx @11ty/eleventy --watch", { cwd: dir });
-  elev.child.on("close", (code) => {
+  // let elev = exec("npx @11ty/eleventy --watch", { cwd: dir });
+  let proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir });
+  proc.on("close", (code) => {
     // console.error("closing");
     console.error("TTTTT closing");
-    // sem.signal();
+    sem.signal();
   });
-  elev.child.stdout.on("data", function(data) {
+  proc.stdout.on("data", function(data) {
     // console.error("stdout: " + data);
     console.error("TTTTT stdout: " + data);
-    if (data.trim() === "[11ty] Watching…") {
+    let str = data.toString();
+    if (str.trim() === "[11ty] Watching…") {
       console.error("TTTTT detected [11ty] Watching");
       sem.signal();
     }
   });
-  elev.child.stderr.on("data", function(data) {
+  proc.stderr.on("data", function(data) {
     console.error("TTTTT stderr: " + data);
   });
   await sem.wait();
@@ -53,10 +57,10 @@ test.before(async t => {
   await setTimeout(300);
 
   console.error("TTTTT will send SIGINT");
-  elev.child.kill("SIGINT");
+  proc.kill("SIGINT");
   console.error("TTTTT sent SIGINT");
-  await elev;
-  // await sem.wait();
+  // await proc;
+  await sem.wait();
   console.error("TTTTT setup completed");
 });
 
