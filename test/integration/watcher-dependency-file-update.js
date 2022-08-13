@@ -1,11 +1,12 @@
-if (parseInt(process.version.match(/^v(\d+)/)[1]) < 16) {
+if (parseInt(process.version.match(/^v(\d+)/)[1]) >= 16) {
   const test = require("ava");
   test("test doesn't support node version < 16", async t => {
     t.pass();
   });
-} else {
+  return;
+}
 
-const util = require("util");
+// const util = require("util");
 // const exec = util.promisify(require("child_process").exec);
 // const spawn = util.promisify(require("child_process").spawn);
 const spawn = require("child_process").spawn;
@@ -20,18 +21,9 @@ const createProject = require("./_create-project2");
 let dir;
 let proc;
 
-const cleanup = () => {
-  console.error("cleanup");
-  if (proc && !proc.killed) {
-    proc.kill();
-    console.error(`did proc.kill(). proc: ${ proc }`);
-  } else {
-    console.error(`No need to kill in cleanup. proc: ${ proc }`);
-  }
-};
-
 test.after.always("cleanup child process", t => {
-  cleanup();
+  if (proc && !proc.killed)
+    proc.kill();
 });
 
 test.before(async t => {
@@ -39,7 +31,7 @@ test.before(async t => {
   await sem.wait();
   dir = createProject("watcher-dependency-file-update");
   // let elev = exec("npx @11ty/eleventy --watch", { cwd: dir });
-  proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 6000 });
+  proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 5000 });
   proc.on("exit", (code, signal) => {
     // console.error("closing");
     console.error(`TTTTT closing code: ${ code }, signal: ${ signal }`);
@@ -100,5 +92,3 @@ test("watcher works", async t => {
   console.error(`TTTTT header.css : ${ headerCSS }`);
   t.is(headerCSS, "header{background-color:red}");
 });
-
-}

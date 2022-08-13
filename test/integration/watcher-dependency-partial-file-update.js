@@ -3,10 +3,12 @@ if (parseInt(process.version.match(/^v(\d+)/)[1]) < 16) {
   test("test doesn't support node version < 16", async t => {
     t.pass();
   });
-} else {
+  return;
+}
 
-const util = require("util");
-const exec = util.promisify(require("child_process").exec);
+// const util = require("util");
+// const exec = util.promisify(require("child_process").exec);
+const { spawn } = require("child_process");
 const path = require("path");
 const { promises: fs } = require("fs");
 const { setTimeout } = require("timers/promises");
@@ -16,30 +18,38 @@ const Semaphore = require("@debonet/es6semaphore");
 
 const createProject = require("./_create-project2");
 let dir;
+let proc;
+
+test.after.always("cleanup child process", t => {
+  if (proc && !proc.killed)
+    proc.kill();
+});
 
 test.before(async t => {
   let sem = new Semaphore(1);
   await sem.wait();
   dir = createProject("watcher-dependency-partial-file-update");
-  let elev = exec("npx @11ty/eleventy --watch", { cwd: dir });
-  elev.child.on("close", (code) => {
+  proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 5000 });
+  proc.on("close", (code) => {
     console.error("closing");
     sem.signal();
   });
-  elev.child.stdout.on("data", function(data) {
+  proc.stdout.on("data", function(data) {
     console.error("stdout: " + data);
-    if (data.trim() === "[11ty] Watching…")
+    let str = data.toString();
+    if (str.trim() === "[11ty] Watching…")
       sem.signal();
   });
   await sem.wait();
+  await setTimeout(300);
 
-  await setTimeout(1000);
   let colorsSCSS = path.join(dir, "_includes", "colors.scss");
   fs.writeFile(colorsSCSS, "$background: blue;"); 
 
   await sem.wait();
+  await setTimeout(300);
 
-  elev.child.kill("SIGINT");
+  proc.kill();
   await sem.wait();
 });
 
@@ -54,5 +64,3 @@ test("watcher works", async t => {
   let styleCSS = await fs.readFile(path.join(dir, "_site/stylesheets/style.css"), { encoding: "utf8" });
   t.is(styleCSS, "header{background-color:pink}body{background-color:blue}");
 });
-
-}
