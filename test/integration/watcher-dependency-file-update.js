@@ -20,20 +20,20 @@ const Semaphore = require("@debonet/es6semaphore");
 const createProject = require("./_create-project2");
 let dir;
 let proc;
+let pid;
 
 test.after.always("cleanup child process", t => {
-  if (proc && !proc.killed)
-    proc.kill();
+  if (proc && proc.exitCode === null) {
+    pid ? process.kill(pid, "SIGINT") : proc.kill();
+  }
 });
 
 test.before(async t => {
   let sem = new Semaphore(1);
   await sem.wait();
   dir = createProject("watcher-dependency-file-update");
-  // let elev = exec("npx @11ty/eleventy --watch", { cwd: dir });
-  proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 5000 });
+  proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 6000 });
   proc.on("exit", (code, signal) => {
-    // console.error("closing");
     console.error(`TTTTT closing code: ${ code }, signal: ${ signal }`);
     sem.signal();
   });
@@ -41,6 +41,12 @@ test.before(async t => {
     // console.error("stdout: " + data);
     console.error("TTTTT stdout: " + data);
     let str = data.toString();
+
+    let match = str.match(/^Eleventy PID: (\d+)/);
+    if (match) {
+      pid = parseInt(match[1]);
+    }
+
     if (str.trim() === "[11ty] Watching…") {
       console.error("TTTTT detected [11ty] Watching");
       sem.signal();
@@ -64,8 +70,10 @@ test.before(async t => {
   await setTimeout(300);
 
   console.error("TTTTT will send SIGINT");
-  // proc.kill("SIGHUP");
-  proc.kill();
+  // proc.kill("SIGINT");
+  // proc.kill();
+  if (pid && process.kill(pid, "SIGINT"))
+    pid = undefined;
   console.error("TTTTT sent SIGINT");
   // await proc;
   await sem.wait();

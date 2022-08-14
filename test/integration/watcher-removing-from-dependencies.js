@@ -19,10 +19,12 @@ const Semaphore = require("@debonet/es6semaphore");
 const createProject = require("./_create-project2");
 let dir;
 let proc;
+let pid;
 
 test.after.always("cleanup child process", t => {
-  if (proc && !proc.killed)
-    proc.kill();
+  if (proc && proc.exitCode === null) {
+    pid ? process.kill(pid, "SIGINT") : proc.kill();
+  }
 });
 
 test.before(async t => {
@@ -37,6 +39,12 @@ test.before(async t => {
   proc.stdout.on("data", function(data) {
     console.error("stdout: " + data);
     let str = data.toString();
+
+    let match = str.match(/^Eleventy PID: (\d+)/);
+    if (match) {
+      pid = parseInt(match[1]);
+    }
+
     if (str.trim() === "[11ty] Watching…")
       sem.signal();
   });
@@ -53,7 +61,9 @@ test.before(async t => {
   await sem.wait();
   await setTimeout(300);
 
-  proc.kill();
+  if (pid && process.kill(pid, "SIGINT"))
+    pid = undefined;
+
   await sem.wait();
 });
 
