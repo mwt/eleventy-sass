@@ -1,15 +1,12 @@
 if (parseInt(process.version.match(/^v(\d+)/)[1]) < 16) {
   const test = require("ava");
-  test("test doesn't support node version < 16", async t => {
+  test("tests don't support node version < 16", async t => {
     t.pass();
   });
   return;
 }
 
-// const util = require("util");
-// const exec = util.promisify(require("child_process").exec);
-// const spawn = util.promisify(require("child_process").spawn);
-const spawn = require("child_process").spawn;
+const { spawn } = require("child_process");
 const path = require("path");
 const { promises: fs } = require("fs");
 const { setTimeout } = require("timers/promises");
@@ -32,13 +29,12 @@ test.before(async t => {
   let sem = new Semaphore(1);
   await sem.wait();
   dir = createProject("watcher-dependency-file-update");
-  proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 6000 });
+  proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 5000 });
   proc.on("exit", (code, signal) => {
     console.error(`TTTTT closing code: ${ code }, signal: ${ signal }`);
     sem.signal();
   });
   proc.stdout.on("data", function(data) {
-    // console.error("stdout: " + data);
     console.error("TTTTT stdout: " + data);
     let str = data.toString();
 
@@ -62,7 +58,7 @@ test.before(async t => {
   console.error("TTTTT will update header.scss");
   fs.writeFile(headerSCSS, `header {
     background-color: red;
-  }`); 
+  }`);
   console.error("TTTTT updating header.scss");
 
   await sem.wait();

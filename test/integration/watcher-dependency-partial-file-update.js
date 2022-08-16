@@ -1,13 +1,11 @@
 if (parseInt(process.version.match(/^v(\d+)/)[1]) < 16) {
   const test = require("ava");
-  test("test doesn't support node version < 16", async t => {
+  test("tests don't support node version < 16", async t => {
     t.pass();
   });
   return;
 }
 
-// const util = require("util");
-// const exec = util.promisify(require("child_process").exec);
 const { spawn } = require("child_process");
 const path = require("path");
 const { promises: fs } = require("fs");
@@ -52,7 +50,7 @@ test.before(async t => {
   await setTimeout(300);
 
   let colorsSCSS = path.join(dir, "_includes", "colors.scss");
-  fs.writeFile(colorsSCSS, "$background: blue;"); 
+  fs.writeFile(colorsSCSS, "$background: blue;");
 
   await sem.wait();
   await setTimeout(300);
