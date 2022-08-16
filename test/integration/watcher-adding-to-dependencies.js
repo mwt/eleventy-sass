@@ -29,8 +29,7 @@ test.before(async t => {
   let sem = new Semaphore(1);
   await sem.wait();
   dir = createProject("watcher-adding-to-dependencies");
-  const npx = process.platform === "win32" ? "npx.cmd" : "npx";
-  proc = spawn(npx, ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 20000 });
+  proc = spawn("npx", ["@11ty/eleventy", "--watch"], { cwd: dir, shell: true, timeout: 20000 });
   proc.on("exit", (code, signal) => {
     console.error(`exit code: ${ code }, signal: ${ signal }`);
     if (process.platform === "darwin")
