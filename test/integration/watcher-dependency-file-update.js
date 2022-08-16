@@ -33,6 +33,8 @@ test.before(async t => {
   proc = spawn(npx, ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 20000 });
   proc.on("exit", (code, signal) => {
     console.error(`TTTTT closing code: ${ code }, signal: ${ signal }`);
+    if (process.platform === "darwin")
+      pid = undefined;
     sem.signal();
   });
   proc.stdout.on("data", function(data) {
