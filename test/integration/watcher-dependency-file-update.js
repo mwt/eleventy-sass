@@ -30,7 +30,7 @@ test.before(async t => {
   await sem.wait();
   dir = createProject("watcher-dependency-file-update");
   const npx = process.platform === "win32" ? "npx.cmd" : "npx";
-  proc = spawn(npx, ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 5000 });
+  proc = spawn(npx, ["@11ty/eleventy", "--watch"], { cwd: dir, timeout: 20000 });
   proc.on("exit", (code, signal) => {
     console.error(`TTTTT closing code: ${ code }, signal: ${ signal }`);
     sem.signal();
