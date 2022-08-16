@@ -67,12 +67,9 @@ test.before(async t => {
   await setTimeout(300);
 
   console.error("TTTTT will send SIGINT");
-  // proc.kill("SIGINT");
-  // proc.kill();
   if (pid && process.kill(pid, "SIGINT"))
     pid = undefined;
   console.error("TTTTT sent SIGINT");
-  // await proc;
   await sem.wait();
   console.error("TTTTT setup completed");
 });
