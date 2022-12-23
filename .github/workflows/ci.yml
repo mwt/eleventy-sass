@@ -33,7 +33,7 @@ jobs:
       - run: npm install
       - run: |
           if [[ ${{ matrix.tag }} == 'canary' ]]; then
-            npm install @11ty/eleventy@canary
+            npm install @11ty/eleventy@2.0.0-canary.18
           fi
       - run: npm test
 env:
