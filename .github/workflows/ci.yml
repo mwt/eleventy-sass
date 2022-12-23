@@ -31,10 +31,8 @@ jobs:
           node-version: ${{ matrix.node }}
           # cache: npm
       - run: npm install
-      - run: |
-          if [[ ${{ matrix.tag }} == 'canary' ]]; then
-            npm install @11ty/eleventy@2.0.0-canary.18
-          fi
+      - if: matrix.tag == 'canary'
+        run: npm install @11ty/eleventy@2.0.0-canary.18
       - run: npm test
 env:
   YARN_GPG: no
